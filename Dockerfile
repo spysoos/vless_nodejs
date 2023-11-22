@@ -1,16 +1,17 @@
-# 使用官方 Node.js 镜像作为基础镜像
-FROM node:lts-alpine3.18
+# 使用 Ubuntu 22.04 作为基础镜像
+FROM ubuntu:22.04
 
-# 设置工作目录
-WORKDIR /app
+# 安装 Shellinabox
+RUN apt-get update && \
+    apt-get install -y shellinabox && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# 将应用程序文件复制到容器中
-COPY . .
+# 设置 root 用户的密码为 'root'
+RUN echo 'root:frepai' | chpasswd
 
-# EXPOSE 3000
+# 暴露 22 端口
+EXPOSE 22
 
-# 安装应用程序的依赖
-RUN npm install
-
-# 设置默认的命令，即启动应用程序
-CMD ["npm", "start"]
+# 启动 Shellinabox
+CMD ["/usr/bin/shellinaboxd", "-t", "-s", "/:LOGIN"]
